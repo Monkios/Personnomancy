@@ -481,7 +481,6 @@
 			return FALSE;
 		}
 
-		/*
 		public function Deactivate( $id ){
 			$personnage_repository = new PersonnageRepository();
 			$c = Roster::GetCharacter( $id );
@@ -510,7 +509,7 @@
 			return FALSE;
 		}
 		
-		public function RebuildComplet( $id, $suffix = FALSE ){
+		/*public function RebuildComplet( $id, $suffix = FALSE ){
 			$personnage_repository = new PersonnageRepository();
 			$c = Roster::GetCharacter( $id );
 			
@@ -700,9 +699,9 @@
 		const RECORD_XP = 1;
 		const RECORD_RACIALE_CAPACITE = 4;
 		//const RECORD_REBUILD = 6;
-		//const RECORD_DESTROY = 7;
+		const RECORD_DESTROY = 7;
 		const RECORD_ACTIVATE = 8;
-		//const RECORD_DEACTIVATE = 9;
+		const RECORD_DEACTIVATE = 9;
 		const RECORD_VOIE = 10;
 		const RECORD_CAPACITE = 11;
 		const RECORD_CONNAISSANCE = 12;

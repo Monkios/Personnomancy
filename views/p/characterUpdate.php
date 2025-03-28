@@ -154,7 +154,7 @@
 	if( is_numeric( $personnage->race_id ) && $personnage->race_id >= 0 && $personnage->est_vivant && ( $personnage->est_cree == FALSE || $has_choices ) ){
 ?>
 			<div class="fiche_regroupement fiche_regroupement_choix">
-				<h3>Création du personnage</h3>
+				<h3>Veuillez compléter vos choix</h3>
 <?php
 		if( $personnage->pc_raciales > 0 ){
 ?>
@@ -278,17 +278,20 @@
 <?php
 		}
 ?>
-				<form method="post" action="?s=player&a=characterUpdate&c=<?php echo $personnage->id; ?>&st=activation" onsubmit="return confirm('Voulez-vous vraiment activer ce personnage ?\n\nUne fois activé, il ne sera plus possible de changer ses informations de base.');">
+			<form method="post" action="?s=player&a=characterUpdate&c=<?php echo $personnage->id; ?>&st=activation" onsubmit="return confirm('Voulez-vous vraiment activer ce personnage ?\n\nUne fois activé, il ne sera plus possible de changer ses informations de base.');">
 <?php
-		if( ( $personnage->pc_raciales > 0 ) || $has_choices ){
+		if( $personnage->pc_raciales > 0 || $has_choices ){
 ?>
-					<p>Notez que vous ne pouvez dépenser vos points d’expérience qu’après avoir sélectionné vos capacités raciales. Avant de continuer, veuillez terminer tous les choix liés aux capacités raciales.</p>
+					<p>Avant de continuer, veuillez terminer tous les choix ci-dessus. Notez que vous ne pouvez dépenser vos points d’expérience avant d'avoir effectués tout vos choix.</p>
 <?php
-		}
+		} elseif( $personnage->pc_raciales == 0 && !$has_choices ) {
 ?>
 					<p>Votre personnage n'a pas encore été activé. Vous ne pouvez pas encore utiliser vos points d'expérience de base.</p>
 					<p>Une fois activé, les informations de base du personnage (nom, cité-État, race, croyance) ne pourront plus être changées.</p>
 					<input type="submit" name="activate_character" value="Activer le personnage"<?php echo ( $personnage->pc_raciales > 0 ) || $has_choices ? " disabled='disabled'" : ""; ?> />
+<?php
+		}
+?>
 				</form>
 			</div>
 <?php
@@ -311,15 +314,21 @@
 <?php
 	foreach( $list_voies as $voie_id => $voie_desc ){
 		$has_voie = in_array( $voie_id, $personnage->voies );
-		
+
 		$voie_status = "";
 		$voie_cost = " title='" . count( $personnage->voies ) . "e voie (" . $personnage->GetNextVoieCost() . " XP)'";
 		if( $has_voie ){
 			$voie_status = "checked='checked' disabled='disabled'";
-		} elseif( $personnage->est_vivant && $personnage->est_cree && $personnage->GetNextVoieCost() <= $personnage->GetRealCurrentXP() ) {
+		} elseif( $personnage->est_vivant && $personnage->est_cree && !$has_choices && $personnage->GetNextVoieCost() <= $personnage->GetRealCurrentXP() ) {
 			$voie_status = "onclick='this.form.submit();'" . $voie_cost;
 		} else {
 			$voie_status = "disabled='disabled'" . $voie_cost;
+		}
+
+		$px_restants = $personnage->GetRealCurrentXP();
+		// Bloque l'achat de capacité et de connaissance si le personnage n'a pas la voie, s'il n'est pas activé ou s'il lui reste des choix
+		if( !$has_voie || !$personnage->est_vivant || !$personnage->est_cree || $has_choices ){
+			$px_restants = 0;
 		}
 ?>
 			
@@ -335,10 +344,6 @@
 			$nb_selections = 0;
 			if( array_key_exists( $capacite_id, $personnage->capacites ) ){
 				$nb_selections = $personnage->capacites[ $capacite_id ];
-			}
-			$px_restants = $personnage->GetRealCurrentXP();
-			if( !$has_voie || !$personnage->est_vivant || !$personnage->est_cree ){
-				$px_restants = 0;
 			}
 ?>
 						<div class="fiche_element">
@@ -366,7 +371,7 @@
 					$connaissance_cost = " title='" . $connaissance->GetConnaissanceType() . " (" . $connaissance->cout . " XP)'";
 					if( in_array( $connaissance_id, $personnage->connaissances ) ){
 						$connaissance_status .= " checked='checked' disabled='disabled'";
-					} elseif( $personnage->est_vivant && $personnage->est_cree && in_array( $connaissance_id, $personnage->connaissances_accessibles ) && $connaissance->cout <= $personnage->GetRealCurrentXP() ) {
+					} elseif( $personnage->est_vivant && $personnage->est_cree && in_array( $connaissance_id, $personnage->connaissances_accessibles ) && $connaissance->cout <= $px_restants ) {
 						$connaissance_status .= " onchange='this.form.submit()'" . $connaissance_cost;
 					} else {
 						$connaissance_status .= " disabled='disabled'" . $connaissance_cost;
@@ -398,7 +403,7 @@
 						$connaissance_status = "title='" . $connaissance->GetConnaissanceType() . " (" . $connaissance->cout . " XP)'";
 						if( in_array( $connaissance_id, $personnage->connaissances ) ){
 							$connaissance_status .= " checked='checked' disabled='disabled'";
-						} elseif( $personnage->est_vivant && $personnage->est_cree && in_array( $connaissance_id, $personnage->connaissances_accessibles ) && $connaissance->cout <= $personnage->GetRealCurrentXP() ) {
+						} elseif( $personnage->est_vivant && $personnage->est_cree && in_array( $connaissance_id, $personnage->connaissances_accessibles ) && $connaissance->cout <= $px_restants ) {
 							$connaissance_status .= " onchange='this.form.submit()'";
 						} else {
 							$connaissance_status .= " disabled='disabled'";
@@ -474,7 +479,7 @@
 				</ul>
 			</form>
 <?php
-	/*if( $personnage->est_vivant ){
+	if( $personnage->est_vivant ){
 ?>
 			<form method="post" action="?s=player&a=characterUpdate&c=<?php echo $personnage->id; ?>&st=kill" onsubmit="return confirm('Voulez-vous vraiment désactiver ce personnage ?\n\nUne fois désactivé, il ne sera plus possible de reprendre ce personnage et vous devrez en commencer un nouveau.');" id="perso_kill">
 				<h3>Désactivation</h3>
@@ -491,7 +496,7 @@
 <?php
 		}
 	}
-	if( $can_rebuild ){
+	/*if( $can_rebuild ){
 ?>
 			<form method="post" action="?s=player&a=characterUpdate&c=<?php echo $personnage->id; ?>&st=rebuild" onsubmit="return confirm('Voulez-vous vraiment offrir un rebuild à ce personnage ?');" id="perso_rebuild">
 				<button type="submit" name="perso_rebuild">Rebuild complet (<?=$personnage->px_totaux; ?> XP)</button>

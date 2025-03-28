@@ -14,9 +14,9 @@
 	foreach( $player_list as $player_id => $player ){
 		if( $player->IsActive && count( $character_list[ $player_id ] ) > 0 ){
 ?>
-						<tr>
-							<td colspan="6"><?php echo $player->GetFullName(); ?></td>
-						</tr>
+					<tr>
+						<td colspan="6"><?php echo $player->GetFullName(); ?></td>
+					</tr>
 <?php
 			if( count( $character_list[ $player_id ] ) == 0 ){
 ?>

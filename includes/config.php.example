@@ -26,8 +26,9 @@
 	define( "SESSION_KEY", "Mancy_SessionKey" );
 	
 	define( "CHARACTER_BASE_XP", 10 );
-	define( "CHARACTER_BASE_AUTOMATICS", "{\"capacites\":[],\"connaissances\":[],\"capacites_raciales\":[],\"voies\":[4]}" );
 	define( "CHARACTER_BASE_PCR", 4 );
+	define( "CHARACTER_BASE_AUTOMATICS", "{\"capacites\":[],\"connaissances\":[],\"capacites_raciales\":[],\"voies\":[4]}" );
+	define( "CHARACTER_BONUS_CHOIX_CONN_VIA_CAPACITE", "{\"7\":[8]}"); // Certaines connaissances sont obtenues gratuitement à l'obtention de la capacité
 	//define( "CHARACTER_BASE_HP", 3 );
 	//define( "CHARACTER_BASE_MP", 3 );
 

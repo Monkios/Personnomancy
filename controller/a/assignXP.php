@@ -7,7 +7,7 @@
 	$raison_xp = "";
 	
 	foreach( $player_list as $player ){
-		if( $player->IsActive && $player->NbCharacters > 0 ){
+		if( $player->IsActive ){
 			$character_list[ $player->Id ] = Roster::GetAllCharactersByPlayer( $player->Id, TRUE );
 		} else {
 			$character_list[ $player->Id ] = array();

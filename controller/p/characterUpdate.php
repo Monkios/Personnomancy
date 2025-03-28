@@ -29,7 +29,7 @@
 			}
 			// Les administrateurs peuvent détruire les personnages
 			// Les animateurs peuvent détruire leurs personnages
-			//$can_destroy = $is_administrateur || ( $is_animateur && $personnage->joueur_id == $_SESSION[ SESSION_KEY ][ "User" ]->Id );
+			$can_destroy = $is_administrateur || ( $is_animateur && $personnage->joueur_id == $_SESSION[ SESSION_KEY ][ "User" ]->Id );
 			//$can_rebuild = $can_rebuild_perte = $can_destroy;
 			$can_add_comment = $is_animateur;
 			$can_add_notes = $is_administrateur || $personnage->joueur_id == $_SESSION[ SESSION_KEY ][ "User" ]->Id;
@@ -375,14 +375,12 @@
 						}
 					}
 					
-					/*
 					if( $_GET["st"] == "kill" ){
 						$personnage = $char_sheet->Deactivate( $personnage->id );
 						if( $personnage == FALSE ){
 							Message::Erreur( "Une erreur s'est produite lors de la désactivation." );
 						}
 					}
-					*/
 				}
 
 				if( $_GET["st"] == "comment" && isset( $_POST["perso_save_comment"] ) && isset( $_POST["perso_comment"] ) ){				
@@ -405,7 +403,6 @@
 					}
 				}
 				
-				/*
 				if( $_GET["st"] == "delete" && isset( $_POST["perso_delete"] ) ){
 					if( $can_destroy ){
 						if( !$char_sheet->Destroy( $personnage->id ) ){
@@ -420,7 +417,7 @@
 					}
 				}
 				
-				if( $_GET["st"] == "rebuild" && isset( $_POST["perso_rebuild"] ) ){
+				/*if( $_GET["st"] == "rebuild" && isset( $_POST["perso_rebuild"] ) ){
 					if( $can_rebuild ){
 						$personnage_id = $char_sheet->RebuildComplet( $personnage->id );
 						if( $personnage_id == FALSE ){

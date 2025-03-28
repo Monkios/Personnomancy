@@ -76,7 +76,7 @@
 		}
 		*/
 
-        public function GetCharacterCountByPlayer( $player_id ){
+        public static function GetCharacterCountByPlayer( $player_id ){
 			if( !is_numeric( $player_id ) ){
 				Message::Fatale( "Identifiant de joueur invalide.", func_get_args() );
 				return FALSE;

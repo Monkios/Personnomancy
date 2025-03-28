@@ -91,7 +91,8 @@ INSERT INTO `choix_connaissance` (`id`, `nom`, `active`, `supprime`) VALUES
 (4, 'Connaissance gratuite : Vigueur', 1, 0),
 (5, 'Connaissance gratuite : Collecte - Coureur des bois', 1, 0),
 (6, 'Connaissance gratuite : Agilité', 1, 0),
-(7, 'Connaissance gratuite : Collecte - Fermier', 1, 0);
+(7, 'Connaissance gratuite : Collecte - Fermier', 1, 0),
+(8, 'Métier gratuit : Capacité Artisanat', 1, 0);
 
 --
 -- Déchargement des données de la table `capacite`
@@ -330,7 +331,14 @@ INSERT INTO `choix_connaissance_connaissance` (`choix_connaissance_id`, `connais
 (1, 21),
 (3, 22),
 (4, 90),
-(2, 91);
+(2, 91),
+(8, 62),
+(8, 63),
+(8, 66),
+(8, 67),
+(8, 68),
+(8, 69),
+(8, 70);
 
 --
 -- Déchargement des données de la table `choix_voie_voie`

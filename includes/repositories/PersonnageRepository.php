@@ -151,7 +151,6 @@
 			return FALSE;
 		}
 		
-		/*
 		public function Deactivate( Personnage &$personnage ){
 			if( $personnage->est_vivant == TRUE ){
 				$personnage->est_vivant = FALSE;
@@ -161,7 +160,6 @@
 			
 			return FALSE;
 		}
-		*/
 		
 		public function Delete( int $id ){
 			if( is_numeric( $id ) ){
@@ -480,18 +478,36 @@
 				}
 
 				if( $force || $this->HasPrerequisCapacite( $personnage, $capacite_id ) ){
+					$is_premiere_selection = false;
+
 					if( !array_key_exists( $capacite_id, $personnage->capacites ) || $personnage->capacites[ $capacite_id ] == 0 ){
 						$sql = "INSERT INTO personnage_capacite( niveau, personnage_id, capacite_id )
 								VALUES ( ?, ?, ? )";
+						$is_premiere_selection = true;
 					} else {
 						$sql = "UPDATE personnage_capacite
 								SET niveau = ( niveau * 1 ) + ?
 								WHERE personnage_id = ? AND capacite_id = ?";
 					}
 					$this->_db->Query( $sql, array( $nb_selections, $personnage->id, $capacite_id ) );
-						
 					$personnage = Roster::GetCharacterComplete( $personnage->id );
-					return $personnage != FALSE;
+
+					$error_occured = FALSE;
+					if( $is_premiere_selection ){
+						// Ajout des connaissances obtenues en sélectionnant la capacité pour la première fois
+						$automatics = json_decode( CHARACTER_BONUS_CHOIX_CONN_VIA_CAPACITE, true );
+						if( array_key_exists( $capacite_id, $automatics ) ){
+							foreach( $automatics[ $capacite_id ] as $choix_connaissance_id ){
+								if( $this->AddChoixConnaissance( $personnage, $choix_connaissance_id ) == FALSE ){
+									Message::Erreur( "AJOUT DE CAPACITÉ : Une erreur s'est produite lors de l'ajout du choix de connaissance #" . $choix_connaissance_id );
+									$error_occured = TRUE;
+									break;
+								}
+							}
+						}
+					}
+					
+					return $error_occured == FALSE;
 				}
 			}
 			
@@ -511,20 +527,38 @@
 				
 				if( is_numeric( $nb_selections )
 						&& $nb_selections <= $personnage->capacites[ $id_capacite ] ){
+					$is_premiere_selection = false;
+
 					if( $personnage->capacites[ $id_capacite ] == $nb_selections ){
 						$sql = "DELETE FROM personnage_capacite
 								WHERE niveau = ?
 									AND personnage_id = ?
 									AND capacite_id = ?";
+						$is_premiere_selection = true;
 					} else {
 						$sql = "UPDATE personnage_capacite
 								SET niveau = ( niveau * 1 ) - ?
 								WHERE personnage_id = ? AND capacite_id = ?";
 					}
 					$this->_db->Query( $sql, array( $nb_selections, $personnage->id, $id_capacite ) );
-						
 					$personnage = Roster::GetCharacterComplete( $personnage->id );
-					return $personnage != FALSE;
+
+					$error_occured = FALSE;
+					if( $is_premiere_selection ){
+						// Ajout des connaissances obtenues en sélectionnant la capacité pour la première fois
+						$automatics = json_decode( CHARACTER_BONUS_CHOIX_CONN_VIA_CAPACITE, true );
+						if( array_key_exists( $id_capacite, $automatics ) ){
+							foreach( $automatics[ $id_capacite ] as $choix_connaissance_id ){
+								if( $this->RemoveChoixConnaissance( $personnage, $choix_connaissance_id ) == FALSE ){
+									Message::Erreur( "RETRAIT DE CAPACITÉ : Une erreur s'est produite lors du retrait du choix de connaissance #" . $choix_connaissance_id );
+									$error_occured = TRUE;
+									break;
+								}
+							}
+						}
+					}
+					
+					return $error_occured == FALSE;
 				}
 			}
 			
